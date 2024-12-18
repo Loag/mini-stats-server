@@ -2,7 +2,8 @@
   "name": "mini-stats-dev",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/devcontainers/features/go": {}
+    "ghcr.io/devcontainers/features/go": {},
+    "ghcr.io/devcontainers/features/docker-outside-of-docker": {}
   },
   "customizations": {
     "vscode": {

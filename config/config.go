@@ -4,10 +4,14 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+
+	"github.com/rs/zerolog/log"
 )
 
 type Config struct {
-	Port int
+	RepoPath  string
+	RepoPort  int
+	RepoToken string
 }
 
 func get_val(val string) string {
@@ -19,13 +23,18 @@ func get_val(val string) string {
 }
 
 func New() *Config {
-	portStr := get_val("PORT")
-	port, err := strconv.Atoi(portStr)
+	repoPath := get_val("REPO_PATH")
+	repoToken := get_val("REPO_TOKEN")
+	repoPortStr := get_val("REPO_PORT")
+
+	repoPort, err := strconv.Atoi(repoPortStr)
 	if err != nil {
-		panic(fmt.Sprintf("unable to parse string to int: %s", portStr))
+		log.Fatal().Err(err).Msg("failed to get repo port")
 	}
 
 	return &Config{
-		Port: port,
+		RepoPath:  repoPath,
+		RepoToken: repoToken,
+		RepoPort:  repoPort,
 	}
 }

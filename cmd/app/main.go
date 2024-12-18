@@ -1,43 +1,25 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"log"
-	"net"
-
 	"mini-stats-server/config"
+	"mini-stats-server/internal/repository"
+	"mini-stats-server/internal/server"
 
-	pb "github.com/Loag/mini-stats-proto/gen/go"
-
-	"google.golang.org/grpc"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
-type server struct {
-	pb.UnimplementedIngestServiceServer
-}
-
-func (s *server) IngestMetric(ctx context.Context, in *pb.IngestRequest) (*pb.IngestResponse, error) {
-	log.Printf("Received metric type: %v and value: %v", in.GetMetricType(), in.GetValue())
-
-	return &pb.IngestResponse{Status: 200}, nil
-}
-
 func main() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+	log.Info().Msg("starting mini stats server")
 
 	conf := config.New()
 
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *&conf.Port))
-	if err != nil {
-		panic(fmt.Sprintf("failed to start listener"))
-	}
+	log.Info().Interface("dict", conf).Msg("configuration")
 
-	s := grpc.NewServer()
-	pb.RegisterIngestServiceServer(s, &server{})
+	repo := repository.New(conf)
 
-	log.Printf("server listening at %v", listener.Addr())
-
-	if err := s.Serve(listener); err != nil {
-		panic(fmt.Sprintf("failed to serve: %v", err))
-	}
+	server := server.New(repo)
+	server.Start()
 }
